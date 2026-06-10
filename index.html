@@ -1,12 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stopwatch</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stopwatch</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0d0d0d, #1a1a2e, #16213e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container { text-align: center; }
+    h1 { color: #e0e0e0; font-size: 2rem; margin-bottom: 30px; letter-spacing: 3px; text-transform: uppercase; }
+    .card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 50px 70px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .timer {
+      font-size: 5rem; font-weight: 800; color: #00d4ff;
+      letter-spacing: 6px; font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 30px rgba(0,212,255,0.5);
+      margin-bottom: 12px; font-family: 'Courier New', monospace;
+    }
+    .status { color: #888; font-size: 0.9rem; letter-spacing: 1px; margin-bottom: 40px; min-height: 22px; }
+    .buttons { display: flex; gap: 16px; justify-content: center; }
+    .btn { padding: 13px 32px; font-size: 1rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; transition: transform 0.15s, opacity 0.2s; }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .btn:active:not(:disabled) { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .start { background: #00c897; color: #fff; }
+    .stop  { background: #ff4d6d; color: #fff; }
+    .reset { background: #7b61ff; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stopwatch</h1>
+    <div class="card">
+      <div class="timer" id="display">00:00:00</div>
+      <div class="status" id="status">Ready</div>
+      <div class="buttons">
+        <button class="btn start" id="startBtn" onclick="start()">Start</button>
+        <button class="btn stop"  id="stopBtn"  onclick="stop()" disabled>Stop</button>
+        <button class="btn reset" id="resetBtn" onclick="reset()">Reset</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    let seconds = 0;
+    let intervalId = null;
+    const display   = document.getElementById('display');
+    const status    = document.getElementById('status');
+    const startBtn  = document.getElementById('startBtn');
+    const stopBtn   = document.getElementById('stopBtn');
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    function updateDisplay() {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      display.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+    }
+
+    function start() {
+      if (intervalId) return;
+      intervalId = setInterval(() => { seconds++; updateDisplay(); }, 1000);
+      status.textContent = '⏱ Running...';
+      startBtn.disabled = true;
+      stopBtn.disabled  = false;
+    }
+
+    function stop() {
+      clearInterval(intervalId);
+      intervalId = null;
+      status.textContent = '⏸ Paused';
+      startBtn.disabled = false;
+      stopBtn.disabled  = true;
+    }
+
+    function reset() {
+      clearInterval(intervalId);
+      intervalId = null;
+      seconds = 0;
+      updateDisplay();
+      status.textContent = 'Ready';
+      startBtn.disabled = false;
+      stopBtn.disabled  = true;
+    }
+  </script>
+</body>
 </html>
